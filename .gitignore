@@ -9,3 +9,6 @@ dist/
 /scripts/package-project.py
 tmp/
 *.log
+
+.vercel
+.env*
