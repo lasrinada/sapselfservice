@@ -1,0 +1,31 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
+    controllerName="sapselfservice.controller.Login">
+    <Page showHeader="false" class="loginPage">
+        <VBox class="loginLayout">
+            <VBox class="loginIntro" justifyContent="Center">
+                <HBox class="loginBrand" alignItems="Center">
+                    <core:Icon src="sap-icon://business-card" />
+                    <Text text="Personalportal" />
+                </HBox>
+                <Title text="Ihr Arbeitsplatz im Überblick" level="H1" wrapping="true" />
+                <Text text="Personalangelegenheiten, Arbeitszeiten und Schulungen an einem Ort." />
+            </VBox>
+            <VBox class="loginPane" justifyContent="Center">
+                <VBox class="loginCard">
+                    <Title text="Anmelden" level="H2" />
+                    <Label text="Demokonto auswählen" labelFor="accountSelect" />
+                    <Select id="accountSelect" width="100%" forceSelection="false"
+                        change=".onDemoSelect" items="{login>/accounts}">
+                        <core:Item key="{login>username}" text="{= %{login>title} + ' · ' + %{login>role} }" />
+                    </Select>
+                    <Label text="Benutzername" labelFor="uidID" />
+                    <Input id="uidID" value="{login>/username}" submit=".onLoginpress" />
+                    <Label text="Passwort" labelFor="passwID" />
+                    <Input id="passwID" value="{login>/password}" type="Password" submit=".onLoginpress" />
+                    <Button text="Anmelden" press=".onLoginpress" type="Emphasized" width="100%" class="loginSubmit" />
+                    <Text text="{login>/passwordHint}" class="loginHint" />
+                </VBox>
+            </VBox>
+        </VBox>
+    </Page>
+</mvc:View>

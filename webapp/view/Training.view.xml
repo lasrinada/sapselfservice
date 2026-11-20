@@ -1,0 +1,232 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
+    controllerName="sapselfservice.controller.Training">
+    <Page title="Schulungsmanagement" showNavButton="true" navButtonPress=".onNavBack" class="hrPage">
+        <dependents>
+            <Dialog id="employeeDialog" title="Demomitarbeiter anlegen" contentWidth="32rem">
+                <VBox class="formStack">
+                    <Label text="Vorname" labelFor="employeeFirst" required="true" />
+                    <Input id="employeeFirst" value="{person>/firstName}" />
+                    <Label text="Nachname" labelFor="employeeLast" required="true" />
+                    <Input id="employeeLast" value="{person>/lastName}" />
+                    <Label text="Benutzername" labelFor="employeeUser" required="true" />
+                    <Input id="employeeUser" value="{person>/username}" />
+                    <Label text="Funktion" labelFor="employeePosition" required="true" />
+                    <Input id="employeePosition" value="{person>/position}" />
+                    <Label text="Abteilung" labelFor="employeeDepartment" required="true" />
+                    <Select id="employeeDepartment" width="100%" items="{training>/departments}" selectedKey="{person>/departmentId}">
+                        <core:Item key="{training>id}" text="{training>name}" />
+                    </Select>
+                </VBox>
+                <beginButton><Button text="Mitarbeiter anlegen" type="Emphasized" press=".onSaveEmployee" /></beginButton>
+                <endButton><Button text="Abbrechen" press=".onCloseEmployee" /></endButton>
+            </Dialog>
+            <Dialog id="assignmentDialog" title="Schulung zuweisen" contentWidth="32rem">
+                <VBox class="formStack">
+                    <Label text="Schulung" labelFor="assignCourse" />
+                    <Select id="assignCourse" width="100%" selectedKey="{assign>/trainingId}" items="{training>/activeTrainings}"
+                        enabled="{= !%{assign>/renewId} &amp;&amp; !%{assign>/editId} }">
+                        <core:Item key="{training>id}" text="{training>title}" />
+                    </Select>
+                    <Label text="Zielgruppe" labelFor="assignMode" />
+                    <Select id="assignMode" width="100%" selectedKey="{assign>/mode}" change=".onAssignmentMode"
+                        enabled="{= !%{assign>/renewId} &amp;&amp; !%{assign>/editId} }">
+                        <core:Item key="person" text="Einzelne Person" />
+                        <core:Item key="group" text="Abteilung" />
+                    </Select>
+                    <VBox visible="{= %{assign>/mode} === 'person' }" class="formFields">
+                        <Label text="Mitarbeiter" labelFor="assignPerson" />
+                        <Select id="assignPerson" width="100%" selectedKey="{assign>/targetId}" forceSelection="false"
+                            items="{training>/people}" enabled="{= !%{assign>/renewId} &amp;&amp; !%{assign>/editId} }">
+                            <core:Item key="{training>id}" text="{training>name}" />
+                        </Select>
+                        <Label text="Fällig am" labelFor="assignmentDue" />
+                        <DatePicker id="assignmentDue" width="100%" value="{assign>/dueOn}" valueFormat="yyyy-MM-dd"
+                            displayFormat="dd.MM.yyyy" change=".onAssignmentDateChange" />
+                    </VBox>
+                    <VBox visible="{= %{assign>/mode} === 'group' }" class="formFields">
+                        <Label text="Abteilung" labelFor="assignDepartment" />
+                        <Select id="assignDepartment" width="100%" selectedKey="{assign>/targetId}" forceSelection="false" items="{training>/departments}">
+                            <core:Item key="{training>id}" text="{training>name}" />
+                        </Select>
+                        <Label text="Frist in Tagen ab Zuweisung" labelFor="assignDays" />
+                        <Input id="assignDays" type="Number" value="{assign>/dueDays}" />
+                    </VBox>
+                </VBox>
+                <beginButton><Button text="Speichern" press=".onSaveAssignment" type="Emphasized" /></beginButton>
+                <endButton><Button text="Abbrechen" press=".onCloseAssign" /></endButton>
+            </Dialog>
+        </dependents>
+        <content>
+            <VBox>
+                <VBox class="trainingIntro">
+                    <Title text="Schulungen und Fristen" level="H1" />
+                    <Text text="Bearbeiten Sie Ihre Schulungen und behalten Sie gültige Nachweise im Blick." />
+                </VBox>
+                <IconTabBar expandable="false" selectedKey="{training>/tab}" select=".onTab" class="sapUiSmallMarginTop">
+                    <items>
+                        <IconTabFilter key="own" text="Meine Schulungen" />
+                        <IconTabFilter key="team" text="Mitarbeiterstatus" visible="{training>/team}" />
+                        <IconTabFilter key="catalog" text="Katalog" visible="{training>/manage}" />
+                        <IconTabFilter key="rules" text="Gruppenregeln" visible="{training>/manage}" />
+                        <IconTabFilter key="exams" text="Prüfungshistorie" visible="{training>/manage}" />
+                    </items>
+                </IconTabBar>
+                <VBox visible="{= %{training>/tab} === 'own' || %{training>/tab} === 'team' }">
+                    <FlexBox wrap="Wrap" class="metrics">
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/total}" /><Text text="Schulungen" /></VBox>
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/mandatory}" /><Text text="Pflichtschulungen" /></VBox>
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/complete}" /><Text text="Abgeschlossen" /></VBox>
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/open}" /><Text text="Offen" /></VBox>
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/overdue}" /><Text text="Überfällig" /></VBox>
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/expiring}" /><Text text="Läuft bald ab" /></VBox>
+                        <VBox class="metric"><ObjectNumber number="{training>/metrics/expired}" /><Text text="Abgelaufen" /></VBox>
+                    </FlexBox>
+                    <ProgressIndicator percentValue="{training>/metrics/percent}" displayValue="{training>/metrics/progress}" state="Information" />
+                    <FlexBox wrap="Wrap" alignItems="Center" class="trainingTools">
+                        <SearchField placeholder="Schulung suchen" width="16rem" value="{training>/query}" liveChange=".onSearch" />
+                        <Select selectedKey="{training>/status}" change=".onFilter" tooltip="Status filtern">
+                            <core:Item key="" text="Aktuelle Zuweisungen" />
+                            <core:Item key="open" text="Offen" />
+                            <core:Item key="started" text="Begonnen" />
+                            <core:Item key="dueSoon" text="Bald fällig" />
+                            <core:Item key="overdue" text="Überfällig" />
+                            <core:Item key="complete" text="Abgeschlossen" />
+                            <core:Item key="expiring" text="Läuft bald ab" />
+                            <core:Item key="expired" text="Abgelaufen" />
+                            <core:Item key="inactive" text="Inaktiv" />
+                            <core:Item key="history" text="Vorherige Durchläufe" />
+                        </Select>
+                        <Select selectedKey="{training>/person}" change=".onFilter" tooltip="Mitarbeiter filtern" forceSelection="false"
+                            visible="{= %{training>/tab} === 'team' }" items="{path: 'training>/teamPeople', templateShareable: false}">
+                            <core:Item key="{training>id}" text="{training>name}" />
+                        </Select>
+                        <Button text="Alle Mitarbeiter" press=".onClearPerson" visible="{= %{training>/tab} === 'team' }" />
+                        <Button text="Zuweisen" type="Emphasized" icon="sap-icon://add" press=".onAssign" visible="{training>/manage}" />
+                        <Button text="Datenschutz-Lektionen" press=".onPrivacy" visible="{= %{training>/tab} === 'own' }" />
+                    </FlexBox>
+                    <Table items="{training>/rows}" noDataText="Keine Zuweisungen für diese Auswahl" autoPopinMode="true" growing="true">
+                        <columns>
+                            <Column importance="High"><Text text="Schulung" /></Column>
+                            <Column visible="{= %{training>/tab} === 'team' }"><Text text="Mitarbeiter" /></Column>
+                            <Column importance="High"><Text text="Status" /></Column>
+                            <Column><Text text="Fällig am" /></Column>
+                            <Column><Text text="Abgeschlossen am" /></Column>
+                            <Column><Text text="Gültig bis" /></Column>
+                            <Column importance="High"><Text text="Aktionen" /></Column>
+                        </columns>
+                        <ColumnListItem>
+                            <VBox>
+                                <ObjectIdentifier title="{training>title}"
+                                    text="{= %{training>category} + ' · ' + (%{training>mandatory} ? 'Pflicht' : 'Optional') }" />
+                                <Text text="{training>description}" />
+                            </VBox>
+                            <Text text="{training>employee}" />
+                            <VBox>
+                                <ObjectStatus text="{training>label}" state="{training>tone}" />
+                                <ProgressIndicator percentValue="{training>progress}" displayValue="{training>progressText}" />
+                                <Text text="{= 'Version ' + %{training>version} }" />
+                            </VBox>
+                            <Text text="{training>dueText}" />
+                            <Text text="{training>completedText}" />
+                            <Text text="{training>validText}" />
+                            <FlexBox wrap="Wrap">
+                                <Button icon="sap-icon://education" tooltip="Schulung öffnen" press=".onLearn" visible="{training>canLearn}" />
+
+                                <Button icon="sap-icon://refresh" tooltip="Erneut zuweisen" press=".onRenew" visible="{training>canRenew}" />
+                                <Button icon="sap-icon://edit" tooltip="Frist bearbeiten" press=".onEditAssignment" visible="{training>canEdit}" />
+                                <Button icon="sap-icon://delete" tooltip="Zuweisung entfernen" press=".onRemove" visible="{training>canRemove}" />
+                            </FlexBox>
+                        </ColumnListItem>
+                    </Table>
+                    <Table class="sapUiSmallMarginTop" items="{training>/peopleMetrics}" autoPopinMode="true"
+                        visible="{= %{training>/tab} === 'team' }" noDataText="Keine Mitarbeiter im Zuständigkeitsbereich">
+                        <headerToolbar><Toolbar><Title text="Pflichtschulungen je Mitarbeiter" level="H2" /></Toolbar></headerToolbar>
+                        <columns>
+                            <Column><Text text="Mitarbeiter" /></Column>
+                            <Column><Text text="Erfüllte Pflichtzuweisungen" /></Column>
+                            <Column><Text text="Überfällig" /></Column>
+                        </columns>
+                        <ColumnListItem>
+                            <Text text="{training>name}" />
+                            <ProgressIndicator percentValue="{training>percent}" displayValue="{training>progress}" />
+                            <ObjectNumber number="{training>overdue}" />
+                        </ColumnListItem>
+                    </Table>
+                </VBox>
+                <VBox visible="{= %{training>/tab} === 'catalog' }">
+                    <OverflowToolbar>
+                        <Title text="Schulungskatalog" level="H2" /><ToolbarSpacer />
+                        <Button text="Zuweisen" press=".onAssign" />
+                        <Button text="Demomitarbeiter anlegen" icon="sap-icon://add-employee" press=".onNewEmployee" visible="{training>/author}" />
+                        <Button text="Schulung anlegen" type="Emphasized" icon="sap-icon://add" press=".onNew" visible="{training>/author}" />
+                    </OverflowToolbar>
+                    <Table items="{training>/trainings}" autoPopinMode="true" growing="true">
+                        <columns>
+                            <Column importance="High"><Text text="Schulung" /></Column>
+                            <Column><Text text="Kategorie" /></Column>
+                            <Column><Text text="Teilnahme" /></Column>
+                            <Column><Text text="Gültigkeit" /></Column>
+                            <Column><Text text="Status" /></Column>
+                            <Column importance="High"><Text text="Aktion" /></Column>
+                        </columns>
+                        <ColumnListItem>
+                            <ObjectIdentifier title="{training>title}" text="{training>description}" />
+                            <Text text="{training>category}" />
+                            <Text text="{= %{training>mandatory} ? 'Pflicht' : 'Optional' }" />
+                            <Text text="{= %{training>validityMonths} ? %{training>validityMonths} + ' Monate' : 'Unbegrenzt' }" />
+                            <VBox>
+                                <ObjectStatus text="{= !%{training>currentVersion} ? 'Entwurf' : (%{training>active} ? 'Aktiv' : 'Inaktiv') }"
+                                    state="{= %{training>active} ? 'Success' : 'None' }" />
+                                <Text text="{= %{training>currentVersion} ? 'Version ' + %{training>currentVersion} + (%{training>hasDraft} ? ' · Entwurf vorhanden' : '') : '' }" />
+                            </VBox>
+                            <Button text="Bearbeiten" icon="sap-icon://edit" press=".onEdit" visible="{training>/author}" />
+                        </ColumnListItem>
+                    </Table>
+                </VBox>
+                <VBox visible="{= %{training>/tab} === 'rules' }">
+                    <OverflowToolbar><Title text="Gruppenregeln" level="H2" /><ToolbarSpacer />
+                        <Button text="Regel anlegen" icon="sap-icon://add" type="Emphasized" press=".onNewRule" />
+                    </OverflowToolbar>
+                    <Table items="{training>/groupRules}" noDataText="Keine Gruppenregeln eingerichtet" autoPopinMode="true" growing="true">
+                        <columns>
+                            <Column><Text text="Pflichtschulung" /></Column>
+                            <Column><Text text="Abteilung" /></Column>
+                            <Column><Text text="Frist" /></Column>
+                            <Column><Text text="Aktion" /></Column>
+                        </columns>
+                        <ColumnListItem>
+                            <Text text="{training>title}" />
+                            <Text text="{training>group}" />
+                            <Text text="{training>dueText}" />
+                            <Button text="Aufheben" icon="sap-icon://delete" press=".onRemoveRule" />
+                        </ColumnListItem>
+                    </Table>
+                </VBox>
+                <VBox visible="{= %{training>/tab} === 'exams' }">
+                    <OverflowToolbar>
+                        <Title text="Prüfungsversuche" level="H2" />
+                        <ToolbarSpacer />
+                        <SearchField placeholder="Schulung, Mitarbeiter oder ID suchen" liveChange=".onSearchHistory" width="20rem" />
+                    </OverflowToolbar>
+                    <Table items="{exams>/rows}" autoPopinMode="true" growing="true" noDataText="Keine Prüfungsversuche für diese Auswahl">
+                        <columns>
+                            <Column importance="High"><Text text="Mitarbeiter" /></Column>
+                            <Column importance="High"><Text text="Schulung" /></Column>
+                            <Column><Text text="Datum und Uhrzeit" /></Column>
+                            <Column><Text text="Versuch" /></Column>
+                            <Column importance="High"><Text text="Ergebnis" /></Column>
+                        </columns>
+                        <ColumnListItem>
+                            <ObjectIdentifier title="{exams>employee}" text="{exams>employeeId}" />
+                            <ObjectIdentifier title="{exams>title}" text="{= 'Version ' + %{exams>version} }" />
+                            <Text text="{exams>dateText}" />
+                            <Text text="{exams>number}" />
+                            <ObjectStatus text="{= %{exams>points} + '/' + %{exams>maximum} + ' · ' + %{exams>percent} + ' % · ' + (%{exams>passed} ? 'Bestanden' : 'Nicht bestanden') }"
+                                state="{= %{exams>passed} ? 'Success' : 'Error' }" />
+                        </ColumnListItem>
+                    </Table>
+                </VBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

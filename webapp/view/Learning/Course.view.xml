@@ -1,0 +1,56 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
+    controllerName="sapselfservice.controller.Learning.Course">
+    <Page id="coursePage" title="{learn>/title}" class="hrPage" showNavButton="true" navButtonPress=".onNavBack">
+        <content>
+            <VBox>
+                <VBox class="card courseIntro">
+                    <Title text="{learn>/title}" wrapping="true" level="H1" />
+                    <Text text="{learn>/description}" />
+                    <FlexBox wrap="Wrap" class="trainingTools">
+                        <ObjectStatus text="{learn>/versionText}" />
+                        <ObjectStatus text="{learn>/status}" state="{learn>/statusTone}" />
+                        <ObjectStatus text="{= 'Abgeschlossen am ' + %{learn>/completion} }" visible="{= !!%{learn>/completion} }" />
+                        <ObjectStatus text="{= 'Gültig bis ' + %{learn>/validity} }" visible="{= !!%{learn>/validity} }" />
+                    </FlexBox>
+                    <ProgressIndicator percentValue="{learn>/progress}" displayValue="{learn>/progressText}" state="Information" />
+                </VBox>
+                <VBox class="courseLayout">
+                    <VBox class="courseNavigation">
+                        <Button text="Übersicht" type="Transparent" icon="sap-icon://overview-chart" press=".onOverview" />
+                        <List items="{learn>/chapterList}" noDataText="Keine Kapitel" headerText="Kapitel">
+                            <StandardListItem title="{= (%{learn>index} + 1) + '. ' + %{learn>title} }"
+                                info="{learn>status}" infoState="{learn>state}" type="{learn>type}" press=".onChapter" wrapping="true" />
+                        </List>
+                        <Button text="Abschlussquiz starten" type="Emphasized" press=".onQuiz" visible="{learn>/canQuiz}" />
+                    </VBox>
+                    <VBox class="courseContent">
+                        <VBox visible="{= %{learn>/section} === 'overview' }" class="card learningContent">
+                            <MessageStrip text="{learn>/result}" type="{learn>/resultType}" showIcon="true" visible="{= !!%{learn>/result} }" />
+                            <Title text="Lernziele" level="H2" />
+                            <Text text="{learn>/objectives}" />
+                            <Title text="Zusammenfassung" level="H2" />
+                            <Text text="{learn>/summary}" />
+                            <MessageStrip text="{learn>/retryMessage}" type="Warning" showIcon="true" visible="{= !!%{learn>/retryMessage} }" />
+                            <Button text="Verfügbarkeit prüfen" press=".onRefresh" visible="{= !!%{learn>/retry/nextAt} }" />
+                            <Title text="Meine Prüfungsversuche" level="H2" />
+                            <List items="{learn>/attempts}" noDataText="Noch kein Versuch eingereicht">
+                                <StandardListItem title="{learn>result}" description="{= 'Versuch ' + %{learn>number} + ' · ' + %{learn>date} }" wrapping="true" />
+                            </List>
+                        </VBox>
+                        <VBox visible="{= %{learn>/section} === 'chapter' }" class="card learningContent">
+                            <Title text="{learn>/chapterTitle}" level="H2" wrapping="true" />
+                            <VBox id="chapterBlocks" class="learningBlocks" />
+                            <Button text="Kapitel als gelesen bestätigen" type="Emphasized" press=".onAcknowledge" visible="{learn>/canAcknowledge}" />
+                        </VBox>
+                        <VBox visible="{= %{learn>/section} === 'quiz' }" class="card learningContent">
+                            <Title text="Abschlussquiz" level="H2" />
+                            <Text text="{learn>/quizRequirement}" />
+                            <VBox id="questionList" />
+                            <Button text="Quiz verbindlich einreichen" type="Emphasized" press=".onSubmit" />
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

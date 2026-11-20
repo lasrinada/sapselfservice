@@ -1,0 +1,26 @@
+specVersion: "4.0"
+metadata:
+  name: sapselfservice
+type: application
+framework:
+  name: SAPUI5
+  version: "1.131.1"
+  libraries:
+    - name: sap.ui.core
+    - name: sap.m
+    - name: sap.f
+    - name: sap.ui.layout
+    - name: sap.ui.unified
+    - name: themelib_sap_horizon
+server:
+  customMiddleware:
+    - name: local-training
+      beforeMiddleware: serveResources
+---
+specVersion: "4.0"
+kind: extension
+type: server-middleware
+metadata:
+  name: local-training
+middleware:
+  path: server/middleware.cjs

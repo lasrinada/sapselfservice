@@ -1,0 +1,90 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:form="sap.ui.layout.form"
+    controllerName="sapselfservice.controller.TrainingEditor">
+    <Page id="editorPage" title="Schulung bearbeiten" class="hrPage" showNavButton="true" navButtonPress=".onNavBack">
+        <content>
+            <VBox>
+                <IconTabBar expandable="false" selectedKey="{editor>/key}" select=".onTab">
+                    <items>
+                        <IconTabFilter text="Stammdaten" key="general" />
+                        <IconTabFilter text="Kapitel" key="chapters" />
+                        <IconTabFilter text="Quiz" key="questions" />
+                        <IconTabFilter text="Versionen" key="history" />
+                    </items>
+                </IconTabBar>
+                <VBox class="editorSection" visible="{= %{editor>/key} === 'general' }">
+                    <form:SimpleForm layout="ResponsiveGridLayout" editable="true" labelSpanL="4" labelSpanM="4" columnsL="2" columnsM="1">
+                        <core:Title text="Schulungsdetails" />
+                        <Label text="Titel" required="true" />
+                        <Input value="{draft>/title}" maxLength="120" />
+                        <Label text="Kategorie" />
+                        <Input value="{draft>/category}" maxLength="80" />
+                        <Label text="Beschreibung" />
+                        <TextArea value="{draft>/description}" rows="3" maxLength="1500" />
+                        <Label text="Lernziele" />
+                        <TextArea value="{draft>/objectives}" rows="3" maxLength="3000" />
+                        <Label text="Zusammenfassung" />
+                        <TextArea value="{draft>/summary}" rows="3" maxLength="4000" />
+                        <Label text="Zuordnung zur Datenschutzkachel" />
+                        <Select selectedKey="{draft>/purpose}">
+                            <core:Item key="general" text="Allgemeine Schulung" />
+                            <core:Item key="privacy" text="Datenschutz" />
+                        </Select>
+
+                        <core:Title text="Teilnahme und Fristen" />
+                        <Label text="Teilnahme" />
+                        <CheckBox text="Pflichtschulung" selected="{draft>/mandatory}" />
+                        <Label text="Automatische Zuordnung" />
+                        <Select selectedKey="{draft>/audience}" enabled="{draft>/mandatory}">
+                            <core:Item key="assigned" text="Einzelne Personen und Abteilungsregeln" />
+                            <core:Item key="all" text="Alle aktiven Mitarbeiter" />
+                        </Select>
+                        <Label text="Standardfrist in Tagen" />
+                        <Input value="{draft>/dueDays}" type="Number" />
+                        <Label text="Gültigkeit in Monaten" />
+                        <Input value="{draft>/validityMonths}" type="Number" placeholder="Leer für unbegrenzt" />
+                        <Label text="Frist nach Ablauf in Tagen" />
+                        <Input value="{draft>/renewalDays}" type="Number" placeholder="Leer für manuelle Neuzuweisung" />
+                        <Label text="Bestehensgrenze in Prozent" />
+                        <Input value="{draft>/passPercent}" type="Number" />
+                        <Label text="Versuchslimit pro Durchlauf" />
+                        <Input value="{draft>/maxAttempts}" type="Number" placeholder="0 für unbegrenzt" />
+                        <Label text="Wartezeit nach Fehlversuch in Minuten" />
+                        <Input value="{draft>/retryMinutes}" type="Number" />
+                    </form:SimpleForm>
+                </VBox>
+                <VBox visible="{= %{editor>/key} === 'chapters' }" class="editorSection">
+                    <OverflowToolbar><Title text="Lernkapitel" level="H2" /><ToolbarSpacer />
+                        <Button text="Kapitel hinzufügen" icon="sap-icon://add" type="Emphasized" press=".onAddChapter" />
+                    </OverflowToolbar>
+                    <VBox id="chapterFields" class="editorColumn" />
+                </VBox>
+                <VBox visible="{= %{editor>/key} === 'questions' }" class="editorSection">
+                    <OverflowToolbar><Title text="Quizfragen" level="H2" /><ToolbarSpacer />
+                        <Button text="Frage hinzufügen" icon="sap-icon://add" type="Emphasized" press=".onAddQuestion" />
+                    </OverflowToolbar>
+                    <VBox id="questionFields" class="editorColumn" />
+                </VBox>
+                <VBox visible="{= %{editor>/key} === 'history' }" class="editorSection">
+                    <Toolbar><Title text="Veröffentlichungen" level="H2" /><ToolbarSpacer />
+                        <Button text="{= %{editor>/active} ? 'Deaktivieren' : 'Aktivieren' }" press=".onToggleActive"
+                            visible="{= %{editor>/versions/length} > 0 }" />
+                    </Toolbar>
+                    <List items="{editor>/versions}" noDataText="Noch keine veröffentlichte Version">
+                        <StandardListItem title="{= 'Version ' + %{editor>version} + ' · ' + %{editor>title} }" description="{editor>date}" />
+                    </List>
+                    <Toolbar><Title text="Änderungsverlauf" level="H2" /></Toolbar>
+                    <List items="{editor>/audit}" noDataText="Noch keine gespeicherten Änderungen">
+                        <StandardListItem title="{editor>action}" description="{= %{editor>name} + ' · ' + %{editor>date} }" />
+                    </List>
+                </VBox>
+            </VBox>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button text="Entwurf speichern" icon="sap-icon://save" press=".onSave" />
+                <Button text="Veröffentlichen" type="Emphasized" press=".onPublish" />
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

@@ -1,0 +1,148 @@
+html, body, body > div, #container-uiarea { height: 100%; }
+
+.sapUiBody {
+    --portal-surface: var(--sapGroup_ContentBackground);
+    --portal-border: var(--sapGroup_ContentBorderColor);
+    --portal-muted: var(--sapContent_LabelColor);
+    --portal-accent: var(--sapLinkColor);
+    --portal-highlight: var(--sapInformativeBackground, var(--sapList_SelectionBackgroundColor));
+    --portal-radius: .75rem;
+}
+
+.portalHeader.sapMTB {
+    background: var(--sapShellColor, var(--portal-surface));
+    border-bottom: 1px solid var(--portal-border);
+    padding-inline: clamp(.75rem, 4vw, 3rem);
+    height: 4rem;
+}
+.sapMPage.dashboardPage.sapMPageWithHeader > section { top: 4rem; }
+.portalMark, .tileIcon {
+    background: var(--portal-highlight);
+    color: var(--portal-accent);
+    border-radius: .5rem;
+    padding: .55rem;
+}
+.portalMark { margin-inline-end: .4rem; }
+.layoutWidth {
+    box-sizing: border-box;
+    width: min(100%, 82rem);
+    margin-inline: auto;
+    padding: clamp(1rem, 2.6vw, 2rem);
+}
+.dashboardHero, .loginIntro, .card, .trainingIntro {
+    background: var(--portal-surface);
+    border: 1px solid var(--portal-border);
+    border-radius: var(--portal-radius);
+}
+.dashboardHero { padding: clamp(1rem, 2.8vw, 2rem); }
+.dashboardHero .sapMTitle, .loginIntro .sapMTitle {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.24;
+    white-space: normal;
+}
+.heroDepartment, .heroDescription, .loginIntro .sapMText, .portalTile .sapMText, .loginHint {
+    color: var(--portal-muted);
+}
+.heroDepartment { margin-bottom: .35rem; }
+.heroDescription { margin-top: .4rem; }
+.sectionTitle { margin-block: 1.4rem .75rem; }
+.portalGrid .sapMLIB, .homeReminders .sapMList {
+    border: 1px solid var(--portal-border);
+    border-radius: var(--portal-radius);
+    background: var(--portal-surface);
+    box-shadow: none;
+}
+.portalGrid .sapMLIB:hover { border-color: var(--portal-accent); }
+.portalGrid .sapUiLayoutCSSGridBoxLayoutContainer { grid-auto-rows: auto; }
+.portalTile { box-sizing: border-box; padding: 1rem 1.15rem; min-height: 8rem; width: 100%; }
+.portalTile .sapMText { margin-top: .35rem; line-height: 1.4; }
+.tileIcon { margin-bottom: .55rem; font-size: 1.1rem; align-self: flex-start; }
+.privacyTile { gap: .2rem; }
+.privacyTile .sapMPI { margin-top: .4rem; }
+
+.hrPage > section { box-sizing: border-box; padding: clamp(.75rem, 2.6vw, 2rem); }
+.hrPage > section > div { max-width: 82rem; margin-inline: auto; }
+.hrPage .sapMList, .hrPage .sapUiForm, .hrPage .sapMPanel {
+    border-radius: var(--portal-radius);
+    background: var(--portal-surface);
+}
+.hrPage .sapMList, .hrPage .sapUiForm { border: 1px solid var(--portal-border); }
+.hrPage .sapUiForm { padding: .6rem; box-sizing: border-box; }
+.formStack { gap: .55rem; max-width: 46rem; padding: 1rem; }
+.formStack .sapMLabel { margin-top: .35rem; }
+.trainingIntro, .card { padding: 1rem 1.25rem; }
+.trainingIntro .sapMTitle { font-size: 1.5rem; margin-bottom: .3rem; }
+.metrics, .trainingTools { gap: .65rem; margin-block: .8rem; }
+.metric {
+    padding: .65rem .9rem;
+    min-width: 7rem;
+    background: var(--portal-surface);
+    border: 1px solid var(--portal-border);
+    border-radius: var(--portal-radius);
+}
+.metric .sapMObjectNumber { color: var(--portal-accent); }
+
+.editorSection { margin-top: 1rem; }
+.editorColumn { max-width: 58rem; gap: .75rem; padding: 1rem; }
+.editorFields { gap: .35rem; }
+.editorBlock {
+    padding: .8rem;
+    border: 1px solid var(--portal-border);
+    border-radius: var(--portal-radius);
+    background: var(--portal-surface);
+}
+.courseLayout.sapMFlexBox {
+    display: grid;
+    grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+    align-items: start;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.courseIntro, .courseNavigation, .learningContent, .learningBlocks { gap: .85rem; }
+.learningContent .sapMText { line-height: 1.55; }
+.learningContent > .sapMBtn, .courseNavigation > .sapMBtn { align-self: flex-start; max-width: 100%; }
+.quizQuestion {
+    padding: .9rem;
+    margin: .5rem 0;
+    border: 1px solid var(--portal-border);
+    border-radius: var(--portal-radius);
+    background: var(--portal-surface);
+    gap: .25rem;
+}
+.quizQuestion .sapMRbBLabel { white-space: normal; }
+.quizQuestion .sapMRb { height: auto; min-height: 2.75rem; }
+
+.loginLayout.sapMFlexBox {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    max-width: 68rem;
+    min-height: min(37rem, calc(100vh - 4rem));
+    margin: clamp(.75rem, 4vw, 3rem) auto;
+    padding-inline: clamp(.75rem, 2vw, 1.5rem);
+    box-sizing: border-box;
+}
+.loginIntro { padding: clamp(1.25rem, 4vw, 3rem); }
+.loginBrand { gap: .6rem; margin-bottom: 1.25rem; color: var(--portal-accent); }
+.loginBrand .sapMText { font-weight: bold; }
+.loginIntro > .sapMText { margin-top: .8rem; max-width: 26rem; }
+.loginPane { padding: clamp(.75rem, 3vw, 2rem); align-items: center; }
+.loginCard {
+    width: min(100%, 25rem);
+    padding: clamp(1rem, 3vw, 1.65rem);
+    background: var(--portal-surface);
+    border: 1px solid var(--portal-border);
+    border-radius: var(--portal-radius);
+    box-sizing: border-box;
+}
+.loginCard .sapMLabel { margin-top: .8rem; }
+.loginSubmit { margin-top: 1rem; }
+.loginHint { margin-top: .65rem; }
+.portalPdfPreview iframe { display: block; width: 100%; height: min(60vh, 39rem); border: 0; }
+@media (max-width: 46rem) {
+    .loginLayout.sapMFlexBox, .courseLayout.sapMFlexBox { grid-template-columns: minmax(0, 1fr); min-height: auto; }
+    .loginPane { padding-inline: 0; }
+    .portalHeader.sapMTB { padding-inline: .65rem; }
+    .portalTile { min-height: 0; }
+    .trainingTools > *, .courseNavigation > *, .learningContent > * { max-width: 100%; }
+}

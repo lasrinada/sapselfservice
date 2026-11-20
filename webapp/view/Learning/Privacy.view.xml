@@ -1,0 +1,11 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
+    controllerName="sapselfservice.controller.Learning.Privacy">
+    <Page title="Datenschutz" class="hrPage" showNavButton="true" navButtonPress=".onNavBack">
+        <VBox class="card learningContent">
+            <BusyIndicator text="Datenschutzschulung wird geladen" visible="{privacy>/loading}" />
+            <MessageStrip text="Für Ihr Konto ist derzeit keine aufrufbare Datenschutzschulung zugewiesen."
+                type="Information" showIcon="true" visible="{= !%{privacy>/loading} }" />
+            <Button text="Zu meinen Schulungen" press=".onNavBack" />
+        </VBox>
+    </Page>
+</mvc:View>

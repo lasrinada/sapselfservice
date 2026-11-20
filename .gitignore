@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.local/
+/Wahlprojekt-Uebergabe.zip
+/README.md
+/docs/
+/output/
+/scripts/build-documentation.py
+/scripts/package-project.py
+tmp/
+*.log

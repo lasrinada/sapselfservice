@@ -1,0 +1,9 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
+    <App id="app">
+        <Page id="startup" showHeader="false" enableScrolling="false">
+            <FlexBox fitContainer="true" alignItems="Center" justifyContent="Center">
+                <BusyIndicator text="Personalportal wird geladen" />
+            </FlexBox>
+        </Page>
+    </App>
+</mvc:View>

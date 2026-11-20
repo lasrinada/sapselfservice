@@ -1,0 +1,23 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:form="sap.ui.layout.form">
+    <Dialog title="Details zur Abwesenheit" contentWidth="33rem">
+        <form:SimpleForm layout="ResponsiveGridLayout" labelSpanL="4" labelSpanM="4" columnsL="1" columnsM="1">
+            <Label text="Mitarbeiter" />
+            <Text text="{absencesModel>/SelectedAbsence/DisplayName}" />
+            <Label text="Abwesenheitsart" />
+            <Text text="{absencesModel>/SelectedAbsence/AbwesenheitsartBeschreibung}" />
+            <Label text="Startdatum" />
+            <Text text="{absencesModel>/SelectedAbsence/FormattedStart}" />
+            <Label text="Enddatum" />
+            <Text text="{absencesModel>/SelectedAbsence/FormattedEnd}" />
+            <Label text="Status" />
+            <ObjectStatus text="{absencesModel>/SelectedAbsence/Status}" state="{absencesModel>/SelectedAbsence/state}" />
+            <Label text="Startzeit" visible="{= !!%{absencesModel>/SelectedAbsence/Startzeit} }" />
+            <Text text="{absencesModel>/SelectedAbsence/Startzeit}" visible="{= !!%{absencesModel>/SelectedAbsence/Startzeit} }" />
+            <Label text="Endzeit" visible="{= !!%{absencesModel>/SelectedAbsence/Endzeit} }" />
+            <Text text="{absencesModel>/SelectedAbsence/Endzeit}" visible="{= !!%{absencesModel>/SelectedAbsence/Endzeit} }" />
+            <Label text="Kommentare" visible="{= !!%{absencesModel>/SelectedAbsence/Kommentare} }" />
+            <Text text="{absencesModel>/SelectedAbsence/Kommentare}" visible="{= !!%{absencesModel>/SelectedAbsence/Kommentare} }" />
+        </form:SimpleForm>
+        <endButton><Button text="Schließen" press=".onCloseDetailsDialog" /></endButton>
+    </Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,107 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
+    xmlns:f="sap.f" xmlns:grid="sap.ui.layout.cssgrid" xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    controllerName="sapselfservice.controller.Main">
+    <Page class="dashboardPage">
+        <customHeader>
+            <OverflowToolbar class="portalHeader">
+                <core:Icon src="sap-icon://business-card" class="portalMark" />
+                <Title text="Personalportal" level="H2" />
+                <ToolbarSpacer />
+                <Button icon="sap-icon://bell" tooltip="Benachrichtigungen" type="Transparent"
+                    press=".onNotiPress" visible="{session>/permissions/selfService}" />
+                <MenuButton text="{session>/name}" icon="sap-icon://employee" type="Transparent">
+                    <menu>
+                        <Menu>
+                            <MenuItem text="Mein Profil" icon="sap-icon://employee" press=".onNavigate" custom:route="profile" />
+                            <MenuItem text="Abmelden" icon="sap-icon://log" press=".onLogoutPress" />
+                        </Menu>
+                    </menu>
+                </MenuButton>
+            </OverflowToolbar>
+        </customHeader>
+        <content>
+            <VBox class="dashboard layoutWidth">
+                <VBox class="dashboardHero">
+                    <Text text="{session>/department}" class="heroDepartment" />
+                    <Title text="{= 'Willkommen, ' + %{session>/Vorname} }" level="H1" wrapping="true" />
+                    <Text text="Personalangelegenheiten und Schulungen im Überblick" class="heroDescription" />
+                </VBox>
+                <VBox class="homeReminders" visible="{= %{home>/reminders/length} > 0 }">
+                    <Title text="Schulungen mit Handlungsbedarf" level="H2" class="sectionTitle" />
+                    <List items="{home>/reminders}" growing="true" growingThreshold="4">
+                        <StandardListItem title="{home>title}" description="{home>date}" info="{home>label}"
+                            infoState="{home>tone}" type="Navigation" press=".onReminder" wrapping="true" />
+                    </List>
+                </VBox>
+                <Title text="Ihre Anwendungen" level="H2" class="sectionTitle" />
+                <f:GridList showSeparators="None" class="portalGrid">
+                    <f:customLayout>
+                        <grid:GridBoxLayout boxMinWidth="16rem" />
+                    </f:customLayout>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="absenceOverview" visible="{session>/permissions/selfService}">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://calendar" class="tileIcon" />
+                            <Title text="Abwesenheitsanträge" level="H3" wrapping="true" />
+                            <Text text="Urlaub und Teleworking beantragen" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="TimeTracking" visible="{session>/permissions/selfService}">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://history" class="tileIcon" />
+                            <Title text="Zeiterfassung" level="H3" />
+                            <Text text="Arbeitszeiten eintragen und einsehen" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="Training">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://education" class="tileIcon" />
+                            <Title text="Schulungen" level="H3" />
+                            <Text text="Kurse, Pflichtschulungen und Fristen" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onPrivacy">
+                        <VBox class="portalTile privacyTile">
+                            <core:Icon src="sap-icon://shield" class="tileIcon" />
+                            <Title text="Datenschutz" level="H3" />
+                            <Text text="{= %{home>/privacy/title} || 'Aktuelle Datenschutzschulung' }" />
+                            <ObjectStatus text="{= %{home>/privacy/label} || 'Keine Zuweisung' }"
+                                state="{= %{home>/privacy/tone} || 'None' }" />
+                            <VBox visible="{= !!%{home>/privacy/id} }">
+                                <Text text="{= %{home>/privacy/mandatory} ? 'Pflichtschulung' : 'Optional' }" />
+                                <ProgressIndicator percentValue="{home>/privacyProgress}" displayValue="{home>/privacy/progressText}" />
+                                <Text text="{= 'Letzter Abschluss ' + %{home>/privacy/lastCompleted} }"
+                                    visible="{= !!%{home>/privacy/lastCompleted} }" />
+                                <Text text="{= 'Gültig bis ' + %{home>/privacy/lastValidUntil} }"
+                                    visible="{= !!%{home>/privacy/lastValidUntil} }" />
+                            </VBox>
+                        </VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="AbsenceOverviewManager" visible="{session>/permissions/approveAbsences}">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://approvals" class="tileIcon" />
+                            <Title text="Abwesenheiten genehmigen" level="H3" wrapping="true" />
+                            <Text text="Anträge für Ihren Zuständigkeitsbereich" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="PayStatements">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://wallet" class="tileIcon" />
+                            <Title text="Entgeltnachweise" level="H3" />
+                            <Text text="Monatliche Nachweise als PDF" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="TaxStatements">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://document-text" class="tileIcon" />
+                            <Title text="Lohnsteuerbescheinigungen" level="H3" wrapping="true" />
+                            <Text text="Jahresbescheinigungen als PDF" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="EmployeeDirectory">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://contacts" class="tileIcon" />
+                            <Title text="Mitarbeiterverzeichnis" level="H3" />
+                            <Text text="Kontakte und Funktionen im Unternehmen" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="FamilyMembers">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://group" class="tileIcon" />
+                            <Title text="Familie und Notfallkontakt" level="H3" wrapping="true" />
+                            <Text text="Angehörige und Erreichbarkeit pflegen" /></VBox>
+                    </f:GridListItem>
+                    <f:GridListItem type="Active" press=".onNavigate" custom:route="profile">
+                        <VBox class="portalTile"><core:Icon src="sap-icon://person-placeholder" class="tileIcon" />
+                            <Title text="Mein Profil" level="H3" />
+                            <Text text="Persönliche Daten und Bankverbindung" /></VBox>
+                    </f:GridListItem>
+                </f:GridList>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
