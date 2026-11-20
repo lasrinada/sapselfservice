@@ -14,5 +14,8 @@
   "devDependencies": {
     "@ui5/cli": "4.0.30",
     "playwright-core": "1.65.1"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
   }
 }

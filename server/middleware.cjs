@@ -26,15 +26,21 @@ async function body(request) {
     if (!request.headers["content-type"]?.startsWith("application/json")) {
         throw new RuleError("Bitte JSON senden.", 415);
     }
-    const chunks = [];
-    let size = 0;
-    for await (const chunk of request) {
-        size += chunk.length;
-        if (size > 1024 * 1024) throw new RuleError("Die Anfrage überschreitet 1 MiB.", 413);
-        chunks.push(chunk);
+    let value = request.body;
+    if (value === undefined) {
+        const chunks = [];
+        let size = 0;
+        for await (const chunk of request) {
+            size += chunk.length;
+            if (size > 1024 * 1024) throw new RuleError("Die Anfrage überschreitet 1 MiB.", 413);
+            chunks.push(chunk);
+        }
+        value = Buffer.concat(chunks).toString("utf8");
     }
+    const serialized = typeof value === "string" ? value : JSON.stringify(value);
+    if (Buffer.byteLength(serialized) > 1024 * 1024) throw new RuleError("Die Anfrage überschreitet 1 MiB.", 413);
     try {
-        const result = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        const result = typeof value === "string" ? JSON.parse(value) : value;
         if (!result || typeof result !== "object" || Array.isArray(result)) throw new Error();
         return result;
     } catch {
@@ -48,8 +54,7 @@ function json(response, status, data) {
     response.end(JSON.stringify(data));
 }
 
-function createMiddleware(service, log = console) {
-    const sessions = new Map();
+function createMiddleware(service, log = console, sessions = new Map()) {
     const prefix = "/api/training/";
     return async (request, response, next) => {
         const pathname = request.url.split("?")[0];
@@ -64,17 +69,19 @@ function createMiddleware(service, log = console) {
                 const identity = await service.identity(id);
                 const token = randomBytes(32).toString("base64url");
                 const now = Date.now();
-                for (const [key, session] of sessions) if (session.until < now) sessions.delete(key);
-                sessions.set(token, { id, until: now + 8 * 60 * 60 * 1000 });
+                if (sessions instanceof Map) {
+                    for (const [key, session] of sessions) if (session.until < now) sessions.delete(key);
+                }
+                await sessions.set(token, { id, until: now + 8 * 60 * 60 * 1000 });
                 return json(response, 200, { data: { ...identity, token } });
             }
             const operation = Object.hasOwn(operations, action) && operations[action];
             if (!operation && action !== "logout") throw new RuleError("Unbekannte Aktion.", 404);
             const token = request.headers.authorization?.match(/^Bearer ([A-Za-z\d_-]+)$/)?.[1];
-            const session = sessions.get(token);
-            if (!session || session.until < Date.now()) throw new RuleError("Die lokale Sitzung ist abgelaufen. Bitte erneut anmelden.", 401);
+            const session = await sessions.get(token);
+            if (!session || session.until < Date.now()) throw new RuleError("Die Sitzung ist abgelaufen. Bitte erneut anmelden.", 401);
             if (action === "logout") {
-                sessions.delete(token);
+                await sessions.delete(token);
                 return json(response, 200, { data: null });
             }
             return json(response, 200, { data: await operation(service, session.id, payload) ?? null });
